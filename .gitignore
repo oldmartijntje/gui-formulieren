@@ -8,6 +8,9 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+config.ini
+systemConfig.ini
+.gitignore
 build/
 develop-eggs/
 dist/
