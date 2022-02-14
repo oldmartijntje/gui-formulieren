@@ -150,13 +150,13 @@ possibleActionsList = ['Press A', 'Press S', 'Press W', 'Press D', 'Press Space'
 
 
 
-
+timeVariable = 60
 
 window = tkinter.Tk()
 window.geometry('650x350')
 window.attributes('-topmost',True)
 
-countdown = 60
+countdown = timeVariable
 highscore = appData[1]
 neededAction = 0
 allowPlay = False
@@ -209,9 +209,17 @@ def startGame():
     global countdown
     global allowPlay
     global startbutton
+    global amountOfTime_entry
+    global amountOfTime_label
+    try:
+        timeVariable=int(amountOfTime_var.get())
+    except:
+        timeVariable = 60
+    amountOfTime_entry.destroy()
+    amountOfTime_label.destroy()
     startButton.destroy()
     allowPlay = True
-    countdown = 61
+    countdown = timeVariable + 1
     createLabel()
     tick()
 
@@ -258,6 +266,15 @@ highscoreCounter.place(y = 0, x = 200)
 currentScore = tkinter.Label(window)
 currentScore.configure(bg = 'black', fg = 'white', textvariable=currentScoreString, font=("Comic Sans MS", 19))
 currentScore.place(y = 0, x = 400)
+
+
+amountOfTime_label = tkinter.Label(window, text = 'Input Time To Play', font = ('calibre',10,'bold'))
+amountOfTime_label.place(y=130, x=250)
+amountOfTime_var=tkinter.StringVar()
+amountOfTime_var.set(20)
+amountOfTime_entry = tkinter.Entry(window,textvariable = amountOfTime_var, font=('calibre',10,'normal'))
+amountOfTime_entry.place(y=150, x=250)
+
 
 startButton = tkinter.Button(window)
 startButton.configure(fg = 'black', bg = 'white', font=("Comic Sans MS", 11), text = 'press here to start', command = startGame)
