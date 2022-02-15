@@ -1,6 +1,6 @@
 import tkinter
-import tkinter.messagebox
-gameVersion = '1.2.0'
+
+gameVersion = 'v5'
 #old variant: [name,[time],{appDictionary},randint1,randint2,[data with lock += 2 randints],[dataHistory],[data with lock without 2 randints]]
 #new variant: [name,[time],{appDictionary},randint1,randint2,[data with lock += 2 randints],[dataHistory],[data with lock without 2 randints]], {achievements}, {collectables}
 
@@ -124,14 +124,16 @@ else:
 
 #use the dictonary for app related files, like for example rebirths or amounts of diamonds
 #change this to your app their name
-appName = 'fpsTrainerMartijn'
+appName = 'clickerV5Martin'
 
 if appName not in appDataDict:#if the user hasn't played before
-    appDataDict[appName] = [gameVersion, {}]
+    appDataDict[appName] = [gameVersion, 0]
 else:
     #print(appDataDict[appName])#prints your data, just to show you how it works
     pass
-
+if appName not in achievements:#if the user hasn't played before
+    achievements[appName] = [[],{}]
+achievements[appName][1] = {69:['haha nice','you got the funny number'],42069:['noice','the upgraded version of 69'],404:['i am not here','404 not found'],1234567890:['order','thats the order of the numbers on your keyboard, :0'],-1:['wow','congrats bro, u have got a minus'],50:['congrats','gefeliciteerd abraham'],666:['satans waltz','Dancing with the devil'],777:['OwO','Holy number']}
 
 #this is your game data, for easy use. but you can also just access your gamedata without this
 appData = appDataDict[appName]
@@ -146,167 +148,110 @@ appData = appDataDict[appName]
 
 #code:
 
-possibleActionsList = ['Press A', 'Press S', 'Press W', 'Press D', 'Press Space', 'Click', 'Double Click', 'Triple Click']
 
 
 
-timeVariable = 20
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 window = tkinter.Tk()
-window.geometry('650x350')
-window.attributes('-topmost',True)
-
-countdown = timeVariable
-if timeVariable not in appDataDict[appName][1]:
-    highscore = 0
-else:
-    highscore = appDataDict[appName][1][timeVariable]
-neededAction = 0
-allowPlay = False
-score = 0
-
-timeString = tkinter.StringVar(value=f'Time Left: {countdown}')
-highscoreString = tkinter.StringVar(value=f'Highscore: {highscore}')
-currentScoreString = tkinter.StringVar(value=f'Current Score: {score}')
-actionString = tkinter.StringVar(value=f'{possibleActionsList[neededAction]}')
+amount = appData[1]
+string = tkinter.StringVar(value=amount)
+window.configure(bg = 'grey')
+touching = False
+lastClicked = 'None'
 
 def on_closing():
     global appDataDict
     window.destroy()
     #use this line if you edited the gamedata before the closeAccount(), if you didn't edit the gamedata, you can skip it
-    appDataDict[appName][1][timeVariable] = highscore
+    
+    appDataDict[appName][1] = amount
     #close the account correctly (so it won't get corrupted), use this where you need it, and save it here as a comment
     closeAccount(name, list1, data)
 
-def updateLabels():
-    global timeString
-    global highscoreString
-    global currentScoreString
-    global appData
-    appDataDict[appName][1][timeVariable] = highscore
-    timeString.set(f'Time Left: {countdown}')
-    highscoreString.set(f'Highscore: {highscore}')
-    currentScoreString.set(f'Current Score: {score}')
-
-def actionFunction(actionPreformed, points = 1):
-    global score 
-    global neededAction
-    global highscore
-    updateLabels()
-    if actionPreformed == neededAction:
-        score += points
-        if score > highscore:
-            highscore = score
-        neededAction = random.randint(0,len(possibleActionsList)-1)
-        createLabel()
-
-def createLabel():
-    global actionLabel
-    global actionString
-    try:
-        actionLabel.destroy()
-    except:
-        pass
-    actionString.set(f'{possibleActionsList[neededAction]}')
-    actionLabel = tkinter.Label(window)
-    actionLabel.configure(bg = 'white', fg = 'black', textvariable=actionString, font=("Comic Sans MS", 11))
-    actionLabel.place(y = random.randint(45,322), x = random.randint(0,575))
-    actionLabel.bind('<Double-Button-1>',lambda event: actionFunction(6,2))
-    actionLabel.bind('<Triple-Button-1>',lambda event: actionFunction(7,2))
-    actionLabel.bind('<Button-1>',lambda event: actionFunction(5,2))
-
-def startGame():
-    global countdown
-    global allowPlay
-    global startbutton
-    global amountOfTime_entry
-    global amountOfTime_label
-    global highscore
-    global timeVariable
-    try:
-        timeVariable=int(amountOfTime_var.get())
-    except:
-        timeVariable = 60
-    if timeVariable not in appDataDict[appName][1]:
-        appDataDict[appName][1][timeVariable] = 0
-    highscore = appDataDict[appName][1][timeVariable]
-    amountOfTime_entry.destroy()
-    amountOfTime_label.destroy()
-    startButton.destroy()
-    allowPlay = True
-    countdown = timeVariable + 1
-    updateLabels()
-    createLabel()
-    tick()
-
-def timeUp():
-    global startButton
-    global score
-    updateLabels()
-    appDataDict[appName][1][timeVariable] = highscore
-    if tkinter.messagebox.askokcancel("Time is up!", f"You got {score} points!\nDo you want to play again?"):
-        startButton = tkinter.Button(window)
-        startButton.configure(fg = 'black', bg = 'white', font=("Comic Sans MS", 11), text = 'press here to start', command = startGame)
-        startButton.place(y=170, x=250)
-        score = 0
-    else:
-        on_closing()
-
-
-
-def tick():
-    global allowPlay
-    global countdown
-    if allowPlay == True:
-        countdown -= 1
-        if countdown == 0:
-            allowPlay = False
-            try:
-                actionLabel.destroy()
-                timeUp()
-            except:
-                pass
+def achievementCheck():
+    global achievements
+    if amount in achievements[appName][1].keys():
+        if amount in achievements[appName][0]:
+            pass
         else:
-            window.after(1000, tick)
-    appDataDict[appName] = appData 
-    updateLabels()
-    
-balkje = tkinter.Label(window)
-balkje.configure(bg = 'black')
-balkje.pack(ipady=10, ipadx=200, fill = 'x')
-timeCounter = tkinter.Label(window)
-timeCounter.configure(bg = 'black', fg = 'white', textvariable=timeString, font=("Comic Sans MS", 19))
-timeCounter.place(y = 0, x = 0)
-highscoreCounter = tkinter.Label(window)
-highscoreCounter.configure(bg = 'black', fg = 'white', textvariable=highscoreString, font=("Comic Sans MS", 19))
-highscoreCounter.place(y = 0, x = 200)
-currentScore = tkinter.Label(window)
-currentScore.configure(bg = 'black', fg = 'white', textvariable=currentScoreString, font=("Comic Sans MS", 19))
-currentScore.place(y = 0, x = 400)
+            achievements[appName][0].append(amount)
+            print(f'\n\nachievement unlocked: {achievements[appName][1][amount][0]}\nDescription: {achievements[appName][1][amount][1]}')
 
 
-amountOfTime_label = tkinter.Label(window, text = 'Input Time To Play', font = ('calibre',10,'bold'))
-amountOfTime_label.place(y=130, x=250)
-amountOfTime_var=tkinter.StringVar()
-amountOfTime_var.set(timeVariable)
-amountOfTime_entry = tkinter.Entry(window,textvariable = amountOfTime_var, font=('calibre',10,'normal'))
-amountOfTime_entry.place(y=150, x=250)
+def changeColor():
+    if touching == True:
+        pass
+    elif amount > 0:
+        window.configure(bg = 'green')
+    elif amount < 0:
+        window.configure(bg = 'red')
+    else:
+        window.configure(bg = 'grey')
+
+def change(change, button = 'None'):
+    global amount
+    global lastClicked
+    lastClicked = button
+    amount = change
+    string.set(amount)
+    achievementCheck()
+    changeColor()
+
+def enter(event):
+    global touching
+    touching = True
+    window.configure(bg = 'yellow')
+
+def leave(event):
+    global touching
+    touching = False
+    changeColor()
+
+def doubleClick(event):
+    global amount
+    match lastClicked:
+        case 'Up':
+            amount = amount * 3
+        case 'Down':
+            amount = amount // 3
+    string.set(amount)
+
+button1 = tkinter.Button(window)
+button1.configure(text='Up', command= lambda: change(amount + 1,'Up'))
+button1.pack(ipady=10, fill = 'x', padx = 10, pady = 10)
+
+label = tkinter.Label(window)
+label.configure(textvariable=string)
+#label.configure(command = lambda: change(amount * -1,'Middle'))
+label.pack(ipady=10, ipadx=200, fill = 'x', padx = 10, pady = 10)
+label.bind('<Enter>',enter)
+label.bind('<Leave>',leave)
+label.bind('<Double-Button-1>',doubleClick)
+window.bind('<space>',doubleClick)
+window.bind('<+>',lambda event: change(amount + 1,'Up'))
+window.bind('-',lambda event: change(amount - 1,'Down'))
 
 
-startButton = tkinter.Button(window)
-startButton.configure(fg = 'black', bg = 'white', font=("Comic Sans MS", 11), text = 'press here to start', command = startGame)
-startButton.place(y=170, x=250)
 
-window.bind('<space>',lambda event: actionFunction(4))
-window.bind('w',lambda event: actionFunction(2))
-window.bind('a',lambda event: actionFunction(0))
-window.bind('s',lambda event: actionFunction(1))
-window.bind('d',lambda event: actionFunction(3))
-
-
+button3 = tkinter.Button(window)
+button3.configure(text='Down', command= lambda: change(amount -1,'Down'))
+button3.pack(ipady=10, ipadx=200, fill = 'x', padx = 10, pady = 10)
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
+
+achievementCheck()
+
 window.mainloop()
-
-
-
