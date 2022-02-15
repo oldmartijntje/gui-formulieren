@@ -149,8 +149,8 @@ appData = appDataDict[appName]
 possibleActionsList = ['Press A', 'Press S', 'Press W', 'Press D', 'Press Space', 'Click', 'Double Click', 'Triple Click']
 
 
-
-timeVariable = 20
+defaultTimeVariable = 20
+timeVariable = defaultTimeVariable
 
 window = tkinter.Tk()
 window.geometry('650x350')
@@ -161,7 +161,7 @@ if timeVariable not in appDataDict[appName][1]:
     highscore = 0
 else:
     highscore = appDataDict[appName][1][timeVariable]
-neededAction = 0
+neededAction = -1
 allowPlay = False
 score = 0
 
@@ -174,7 +174,10 @@ def on_closing():
     global appDataDict
     window.destroy()
     #use this line if you edited the gamedata before the closeAccount(), if you didn't edit the gamedata, you can skip it
-    appDataDict[appName][1][timeVariable] = highscore
+    try:
+        appDataDict[appName][1][timeVariable] = int(highscore)
+    except:
+        pass
     #close the account correctly (so it won't get corrupted), use this where you need it, and save it here as a comment
     closeAccount(name, list1, data)
 
@@ -183,7 +186,8 @@ def updateLabels():
     global highscoreString
     global currentScoreString
     global appData
-    appDataDict[appName][1][timeVariable] = highscore
+    if allowPlay == True:
+        appDataDict[appName][1][timeVariable] = highscore
     timeString.set(f'Time Left: {countdown}')
     highscoreString.set(f'Highscore: {highscore}')
     currentScoreString.set(f'Current Score: {score}')
@@ -203,6 +207,8 @@ def actionFunction(actionPreformed, points = 1):
 def createLabel():
     global actionLabel
     global actionString
+    global neededAction
+    neededAction = random.randint(0,len(possibleActionsList)-1)
     try:
         actionLabel.destroy()
     except:
@@ -223,36 +229,64 @@ def startGame():
     global amountOfTime_label
     global highscore
     global timeVariable
-    try:
+    if amountOfTime_var.get() != '':
         timeVariable=int(amountOfTime_var.get())
-    except:
-        timeVariable = 60
-    if timeVariable not in appDataDict[appName][1]:
-        appDataDict[appName][1][timeVariable] = 0
-    highscore = appDataDict[appName][1][timeVariable]
-    amountOfTime_entry.destroy()
-    amountOfTime_label.destroy()
-    startButton.destroy()
-    allowPlay = True
-    countdown = timeVariable + 1
-    updateLabels()
-    createLabel()
-    tick()
+        if timeVariable < 0:
+            timeVariable *= -1
+        if timeVariable not in appDataDict[appName][1]:
+            appDataDict[appName][1][timeVariable] = 0
+        highscore = appDataDict[appName][1][timeVariable]
+        amountOfTime_entry.destroy()
+        amountOfTime_label.destroy()
+        startButton.destroy()
+        allowPlay = True
+        countdown = timeVariable + 1
+        updateLabels()
+        createLabel()
+        tick()
 
 def timeUp():
     global startButton
     global score
+    global amountOfTime_entry
+    global amountOfTime_label
     updateLabels()
     appDataDict[appName][1][timeVariable] = highscore
     if tkinter.messagebox.askokcancel("Time is up!", f"You got {score} points!\nDo you want to play again?"):
         startButton = tkinter.Button(window)
         startButton.configure(fg = 'black', bg = 'white', font=("Comic Sans MS", 11), text = 'press here to start', command = startGame)
         startButton.place(y=170, x=250)
+        amountOfTime_entry = tkinter.Entry(window,textvariable = amountOfTime_var, font=('calibre',10,'normal'))
+        amountOfTime_entry.place(y=150, x=250)
+        amountOfTime_label = tkinter.Label(window, text = 'Input Time To Play', font = ('calibre',10,'bold'))
+        amountOfTime_label.place(y=125, x=250)
         score = 0
     else:
         on_closing()
 
-
+def callback(*args):
+    global timeVariable
+    global highscore
+    global countdown
+    while amountOfTime_var.get() != '':
+        try:
+            timeVariable=int(amountOfTime_var.get())
+            if timeVariable < 0:
+                timeVariable *= -1
+            break
+        except:
+            amountOfTime_var.set(amountOfTime_var.get()[0:-1])
+    if timeVariable not in appDataDict[appName][1]:
+        highscoreString.set(f'Highscore: -')
+        highscore = ' -'
+    else:
+        highscore = appDataDict[appName][1][timeVariable]
+    countdown = timeVariable
+    updateLabels()
+    if amountOfTime_var.get() == '':
+        highscoreString.set(f'Highscore: NaN')
+        timeString.set(f'Time Left: NaN')
+        
 
 def tick():
     global allowPlay
@@ -291,6 +325,7 @@ amountOfTime_var=tkinter.StringVar()
 amountOfTime_var.set(timeVariable)
 amountOfTime_entry = tkinter.Entry(window,textvariable = amountOfTime_var, font=('calibre',10,'normal'))
 amountOfTime_entry.place(y=150, x=250)
+amountOfTime_var.trace('w', callback)
 
 
 startButton = tkinter.Button(window)
