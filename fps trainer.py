@@ -1,6 +1,6 @@
 import tkinter
 import tkinter.messagebox
-gameVersion = '1.0.0'
+gameVersion = '1.2.0'
 #old variant: [name,[time],{appDictionary},randint1,randint2,[data with lock += 2 randints],[dataHistory],[data with lock without 2 randints]]
 #new variant: [name,[time],{appDictionary},randint1,randint2,[data with lock += 2 randints],[dataHistory],[data with lock without 2 randints]], {achievements}, {collectables}
 
@@ -127,9 +127,9 @@ else:
 appName = 'fpsTrainerMartijn'
 
 if appName not in appDataDict:#if the user hasn't played before
-    appDataDict[appName] = [gameVersion, 0]
+    appDataDict[appName] = [gameVersion, {}]
 else:
-    #print(appDataDict[appName])#prints your data, just to show you how it works
+    print(appDataDict[appName])#prints your data, just to show you how it works
     pass
 
 
@@ -150,14 +150,17 @@ possibleActionsList = ['Press A', 'Press S', 'Press W', 'Press D', 'Press Space'
 
 
 
-timeVariable = 60
+timeVariable = 20
 
 window = tkinter.Tk()
 window.geometry('650x350')
 window.attributes('-topmost',True)
 
 countdown = timeVariable
-highscore = appData[1]
+if timeVariable not in appDataDict[appName][1]:
+    highscore = 0
+else:
+    highscore = appDataDict[appName][1][timeVariable]
 neededAction = 0
 allowPlay = False
 score = 0
@@ -167,13 +170,19 @@ highscoreString = tkinter.StringVar(value=f'Highscore: {highscore}')
 currentScoreString = tkinter.StringVar(value=f'Current Score: {score}')
 actionString = tkinter.StringVar(value=f'{possibleActionsList[neededAction]}')
 
+def on_closing():
+    window.destroy()
+    #use this line if you edited the gamedata before the closeAccount(), if you didn't edit the gamedata, you can skip it
+    appDataDict[appName][1][timeVariable] = highscore
+    #close the account correctly (so it won't get corrupted), use this where you need it, and save it here as a comment
+    closeAccount(name, list1, data)
 
 def updateLabels():
     global timeString
     global highscoreString
     global currentScoreString
     global appData
-    appData[1] = highscore
+    appDataDict[appName][1][timeVariable] = highscore
     timeString.set(f'Time Left: {countdown}')
     highscoreString.set(f'Highscore: {highscore}')
     currentScoreString.set(f'Current Score: {score}')
@@ -211,15 +220,21 @@ def startGame():
     global startbutton
     global amountOfTime_entry
     global amountOfTime_label
+    global highscore
+    global timeVariable
     try:
         timeVariable=int(amountOfTime_var.get())
     except:
         timeVariable = 60
+    if timeVariable not in appDataDict[appName][1]:
+        appDataDict[appName][1][timeVariable] = 0
+    highscore = appDataDict[appName][1][timeVariable]
     amountOfTime_entry.destroy()
     amountOfTime_label.destroy()
     startButton.destroy()
     allowPlay = True
     countdown = timeVariable + 1
+    updateLabels()
     createLabel()
     tick()
 
@@ -227,13 +242,14 @@ def timeUp():
     global startButton
     global score
     updateLabels()
+    appDataDict[appName][1][timeVariable] = highscore
     if tkinter.messagebox.askokcancel("Time is up!", f"You got {score} points!\nDo you want to play again?"):
         startButton = tkinter.Button(window)
         startButton.configure(fg = 'black', bg = 'white', font=("Comic Sans MS", 11), text = 'press here to start', command = startGame)
         startButton.place(y=170, x=250)
         score = 0
     else:
-        window.destroy()
+        on_closing()
 
 
 
@@ -271,7 +287,7 @@ currentScore.place(y = 0, x = 400)
 amountOfTime_label = tkinter.Label(window, text = 'Input Time To Play', font = ('calibre',10,'bold'))
 amountOfTime_label.place(y=130, x=250)
 amountOfTime_var=tkinter.StringVar()
-amountOfTime_var.set(20)
+amountOfTime_var.set(timeVariable)
 amountOfTime_entry = tkinter.Entry(window,textvariable = amountOfTime_var, font=('calibre',10,'normal'))
 amountOfTime_entry.place(y=150, x=250)
 
@@ -288,11 +304,8 @@ window.bind('d',lambda event: actionFunction(3))
 
 
 
-
+window.protocol("WM_DELETE_WINDOW", on_closing)
 window.mainloop()
 
 
-#use this line if you edited the gamedata before the closeAccount(), if you didn't edit the gamedata, you can skip it
-appDataDict[appName] = appData 
-#close the account correctly (so it won't get corrupted), use this where you need it, and save it here as a comment
-closeAccount(name, list1, data)
+
