@@ -133,7 +133,7 @@ else:
     pass
 if appName not in achievements:#if the user hasn't played before
     achievements[appName] = [[],{}]
-achievements[appName][1] = {69:['haha nice','you got the funny number'],42069:['noice','the upgraded version of 69'],404:['i am not here','404 not found'],1234567890:['order','thats the order of the numbers on your keyboard, :0'],-1:['wow','congrats bro, u have got a minus'],50:['congrats','gefeliciteerd abraham'],666:['satans waltz','Dancing with the devil'],777:['OwO','Holy number']}
+achievements[appName][1] = {69:['haha nice','you got the funny number'],42069:['noice','the upgraded version of 69'],404:['i am not here','404 not found'],1234567890:['how did we get here?','thats the order of the numbers on your keyboard, :0'],-1:['wow','congrats bro, u have got a minus'],50:['congrats','gefeliciteerd abraham'],666:['satans waltz','Dancing with the devil'],777:['OwO','Holy number']}
 
 #this is your game data, for easy use. but you can also just access your gamedata without this
 appData = appDataDict[appName]
@@ -204,9 +204,16 @@ def changeColor():
 def change(change, button = 'None'):
     global amount
     global lastClicked
+    global checkbutton
     lastClicked = button
+    if lastClicked != 'None':
+        checkbutton.configure(state= "normal")
+        
     amount = change
-    string.set(amount)
+    if amount == 404:
+        string.set('')
+    else:
+        string.set(amount)
     achievementCheck()
     changeColor()
 
@@ -228,6 +235,20 @@ def doubleClick(event):
         case 'Down':
             amount = amount // 3
     string.set(amount)
+
+def tick():
+    if checkboxVar.get() == 1:
+        if lastClicked == 'Up':
+            change(amount + 1,'Up')
+        else:
+            change(amount - 1,'Down')
+    window.after(200, tick)
+
+checkboxVar = tkinter.IntVar()
+checkbutton = tkinter.Checkbutton(window)
+checkbutton.configure(text = 'autoclicker',state= "disabled", variable=checkboxVar)
+checkbutton.pack()
+
 
 button1 = tkinter.Button(window)
 button1.configure(text='Up', command= lambda: change(amount + 1,'Up'))
@@ -252,6 +273,7 @@ button3.pack(ipady=10, ipadx=200, fill = 'x', padx = 10, pady = 10)
 
 window.protocol("WM_DELETE_WINDOW", on_closing)
 
+tick()
 achievementCheck()
 
 window.mainloop()
