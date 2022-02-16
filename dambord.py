@@ -12,8 +12,12 @@ for x in range(10):
     for y in range(10):
         if x % 2 == 0:
             labelClass = tile(blackOrWhite,'red',f'{tekst[y]}{10-x}',y,x,20,10)
-            labelClass.label.bind('<Button-1>',lambda event: labelClass.label.configure(fg='red'))
-            
+            #labelClass.label.bind('<Button-1>',lambda event: labelClass.label.configure(fg='red'))
+            #both don't work
+            label = tkinter.Label(window)
+            label.configure(bg = blackOrWhite,text= f'{tekst[y]}{10-x}',fg = blackOrWhite)
+            label.bind('<Button-1>',lambda event: print(label['text']))
+            label.grid(column=y, row=x, ipadx=20, ipady=10)
 
         else:
             tkinter.Label(window,bg = blackOrWhite,text= f'{tekst[9-y]}{10-x}',fg = 'red').grid(column=9-y, row=x, ipadx=20, ipady=10)
