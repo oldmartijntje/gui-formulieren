@@ -1,4 +1,3 @@
-from cProfile import label
 import tkinter
 import random
 window = tkinter.Tk()
