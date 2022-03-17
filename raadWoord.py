@@ -3,6 +3,7 @@ import accounts_omac
 import random
 from tkinter.messagebox import showerror
 from tkinter.messagebox import showinfo
+from tkinter import ttk
 
 replay = True
 wordLenght = [4, 7]
@@ -98,7 +99,7 @@ while replay:
         random.shuffle(letters)
         exec(f"current_value{spinboxNumber} = tkinter.StringVar()")
         exec(f"current_value{spinboxNumber}.set(letters[0])")
-        exec(f"spin_box{spinboxNumber} = tkinter.Spinbox(game_window, value = letters, textvariable=current_value{spinboxNumber},wrap=True, state = 'readonly')")
+        exec(f"spin_box{spinboxNumber} = ttk.Spinbox(game_window, value = letters, textvariable=current_value{spinboxNumber},wrap=True, state = 'readonly')")
         exec(f"spin_box{spinboxNumber}.grid(column={spinboxNumber}, row=0, ipadx=20, ipady=10, sticky='EW')")
 
     guess_label_var = tkinter.StringVar()

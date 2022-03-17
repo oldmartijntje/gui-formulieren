@@ -51,7 +51,10 @@ def loadAccount(accountName = 'testaccount', configSettings = ['accounts/', 'Fal
     #just loading the json
     with open(f'{path}{accountName.lower()}{fileExtention}.json') as json_file:
         dataString = json.load(json_file)
-        data = json.loads(dataString)
+        if type(dataString) != dict:
+            data = json.loads(dataString)
+        else:
+            data= dataString
         data['loadTime'] = datetime.datetime.now()
     if data['versionHistory'][len(data['versionHistory']) -1] != version:
         data['versionHistory'].append(version)
@@ -169,8 +172,8 @@ def questionTkinter(question = 'account doesn\'t exist, should i create it?', ti
 
 def createAppData(data, appID):
     '''creates empty errays for you to use in the dicts'''
-    if appID not in data['appdata']:
-        data['appdata'][appID] = []
+    if appID not in data['appData']:
+        data['appData'][appID] = []
     if appID not in data['collectables']:
         data['collectables'][appID] = []
     if appID not in data['achievements']:

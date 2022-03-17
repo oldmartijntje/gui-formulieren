@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 config.ini
+mailConfig.ini
 systemConfig.ini
 .gitignore
 build/
