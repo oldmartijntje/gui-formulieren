@@ -45,8 +45,7 @@ def inputCode(*args):
         code = code_var.get()
         if len(str(1111110111111)) == len(code):
             if code.isnumeric():
-                code = int(code)
-                if str(code)[6] != str(0) or str(code)[6] != str(1) and str(code)[0] in numbers_used and str(code)[1] in numbers_used2 and str(code)[2] in numbers_used3 and str(code)[len(str(code))-1] in numbers_used4:
+                if (code[6] == str(0) or code[6] == str(1)) and code[0] in numbers_used and code[1] in numbers_used2 and code[2] in numbers_used3 and code[len(code)-1] in numbers_used4:
                     if str(code)[6] == str(0):
                         tkinter.messagebox.showinfo(title=messagesTitle,message ='You were not accepted, sorry')
                     else:
